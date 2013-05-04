@@ -90,6 +90,18 @@ module Xray
     ActiveSupport::SafeBuffer === source ? ActiveSupport::SafeBuffer.new(augmented) : augmented
   end
 
+  # A regex for capturing the top-level, class-and-id-based
+  # selectors in a CSS file. It doesn't deal with comments,
+  # which are stripped separately.
+  #
+  # Because the matching is more complicated than can be
+  # demonstrated here, see http://regexr.com?34ovq for an
+  # exhaustive demo.
+  #
+  # Captures:
+  #   $1 = the top level selector, its chained classes and psuedo-selctors
+  CSS_REGEX = /((?:^\s*[.#]|(?<=[,}\s]))(?<=[.,#}]|[^\w][,;\t\r\n }])[.#][^\r\n,{} ]+)(?:(?=[^}]*{)|\s*{)/
+
   def self.next_id
     @id = (@id ||= 0) + 1
   end
