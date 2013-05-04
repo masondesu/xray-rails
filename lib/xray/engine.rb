@@ -9,6 +9,9 @@ module Xray
     initializer "xray.initialize" do |app|
       app.middleware.use Xray::Middleware
 
+      # Add the xray tmp directory to Asset Pipeline
+      app.assets.append_path 'tmp/cache/assets/xray'
+
       # Register as a Sprockets processor to augment JS files, including
       # compiled coffeescript, with filepath information. See
       # `Xray.augment_js` for details.
