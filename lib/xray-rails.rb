@@ -102,6 +102,27 @@ module Xray
   #   $1 = the top level selector, its chained classes and psuedo-selctors
   CSS_REGEX = /((?:^\s*[.#]|(?<=[,}\s]))(?<=[.,#}]|[^\w][,;\t\r\n }])[.#][^\r\n,{} ]+)(?:(?=[^}]*{)|\s*{)/
 
+
+  # Returns the result of a scan for all top-level classes and ids
+  # in the CSS. This will later be written to a temporary JS file
+  # and used to associate top-level classes and ids with their
+  # corresponding files.
+  def self.render_css_map(source, path)
+    scan_result = source.dup
+
+    # Remove comments and newlines
+    scan_result.gsub! /\/\*[^*]*\*+(?:[^\/*][^*]*\*+)*\//m, ''
+    scan_result.gsub! /[\n\r]/, ''
+
+    # Get a unique map of selctors and filepaths
+    map = {}
+    map[path] = scan_result.scan(CSS_REGEX).uniq.flatten
+
+    # Return it as a JSON object in a global variable
+    "window.XrayCSSMap || (window.XrayCSSMap = {}); \
+     \n$.extend(XrayCSSMap, #{map.to_json})"
+  end
+
   def self.next_id
     @id = (@id ||= 0) + 1
   end
