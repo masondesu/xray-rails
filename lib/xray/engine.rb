@@ -1,5 +1,3 @@
-require "fileutils"
-
 module Xray
 
   # This is the main point of integration with Rails. This engine hooks into
@@ -10,9 +8,6 @@ module Xray
   class Engine < ::Rails::Engine
     initializer "xray.initialize" do |app|
       app.middleware.use Xray::Middleware
-
-      # Add the xray tmp directory to Asset Pipeline
-      app.assets.append_path 'tmp/cache/assets/xray'
 
       # Register as a Sprockets processor to augment JS files, including
       # compiled coffeescript, with filepath information. See
@@ -55,25 +50,7 @@ module Xray
       app.assets.register_preprocessor 'text/css', :xray do |context, source|
         path = context.pathname.to_s
         if path =~ /^#{app.root}.+\.(css|scss|sass|less)(\.|$)/
-          tmp_file = 'xray_css_map.js'
-          tmp_folder = "#{app.root}/tmp/cache/assets/xray/"
-
-          # Get the CSS map
-          css_map = Xray.render_css_map(source, path)
-
-          # make sure the tmp folder exists
-          unless File.exist? tmp_folder
-            FileUtils.mkdir_p tmp_folder
-          end
-
-          File.open("#{tmp_folder+tmp_file}", 'a+') do |f|
-            # Remove previous contents
-            # BRENT, IS THIS RIGHT? It seems like this would
-            # overrite it for each file :(
-            f.truncate(0)
-            # Write in the map into a tmp file
-            f.write css_map
-          end
+          Xray.push_to_css_map(source, path)
         end
         # Return the unchanged source
         source

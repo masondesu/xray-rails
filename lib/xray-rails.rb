@@ -104,23 +104,24 @@ module Xray
 
 
   # Returns the result of a scan for all top-level classes and ids
-  # in the CSS. This will later be written to a temporary JS file
+  # in the CSS. This will later be injected as JSON via a script tag
   # and used to associate top-level classes and ids with their
   # corresponding files.
-  def self.render_css_map(source, path)
+  def self.push_to_css_map(source, path)
     scan_result = source.dup
 
     # Remove comments and newlines
     scan_result.gsub! /\/\*[^*]*\*+(?:[^\/*][^*]*\*+)*\//m, ''
     scan_result.gsub! /[\n\r]/, ''
 
-    # Get a unique map of selctors and filepaths
-    map = {}
-    map[path] = scan_result.scan(CSS_REGEX).uniq.flatten
+    # Push the generated map into the multi-file mapping hash
+    Xray.css_map[path] = scan_result.scan(CSS_REGEX).uniq.flatten
+  end
 
-    # Return it as a JSON object in a global variable
-    "window.XrayCSSMap || (window.XrayCSSMap = {}); \
-     \n$.extend(XrayCSSMap, #{map.to_json})"
+  # A hash used to store and inject the CSS maps from each
+  # stylesheet that's been run through the preprocessor
+  def self.css_map
+    @css_map ||= {}
   end
 
   def self.next_id
