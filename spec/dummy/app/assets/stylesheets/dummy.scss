@@ -11,8 +11,14 @@
   display: none;
 }
 
+// Spoof and a goof
+
 .dummy-class-3 {
   display: none;
+}
+
+blockquote {
+  display: block;
 }
 
 .dummy-class-4 {
@@ -21,4 +27,16 @@
 
 #dummy-id {
   display: none;
+}
+
+// the next selector should be in the map
+.dummy-class-after-single-line-comment {
+  display: block;
+}
+
+/*
+  A great comment
+*/
+.dummy-class-after-multi-line-comment {
+  display: block;
 }

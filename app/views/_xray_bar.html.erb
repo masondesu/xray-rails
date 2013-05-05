@@ -42,7 +42,7 @@
   </div>
   <%= stylesheet_link_tag :xray %>
   <!-- Inject the selector-to-filepath mappings -->
-  <script>
+  <script id="xray-css-mapping-script">
     window.Xray || (window.Xray = {});
     Xray.cssMap = <%= raw Xray.css_map.to_json %>;
   </script>
