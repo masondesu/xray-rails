@@ -39,7 +39,6 @@ module Xray
           body = response.body.sub(/<body[^>]*>/) { "#{$~}\n#{xray_bar}" }
           append_js!(body, 'jquery', :xray)
           append_js!(body, 'backbone', :'xray-backbone')
-          append_css_map! body
           headers['Content-Length'] = body.bytesize.to_s
         end
         [status, headers, (body ? [body] : response)]
@@ -62,12 +61,6 @@ module Xray
         h = ActionController::Base.helpers
         "#{$~}\n" + h.javascript_include_tag(script_name)
       end
-    end
-
-    # Appends a script tag to the end of the head tag that contains
-    # a map of top-level css selectors and their corresponding files.
-    def append_css_map!(html)
-      html.sub! /<\/head>/, "<script src='/assets/xray_css_map.js'></script>\n</head>"
     end
 
     def should_inject_xray?(status, headers, response)
